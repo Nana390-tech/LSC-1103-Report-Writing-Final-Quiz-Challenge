@@ -820,7 +820,26 @@ function showResults(){
  
   const bd=Object.entries(modSc).filter(([,v])=>v.t>0)
     .map(([m,v])=>`<div class="bd-it"><div class="bd-mod">${m}</div><div class="bd-sc">${v.g}<span class="bd-of">/${v.t}</span></div></div>`).join('');
+  const passed = pct >= 80;
   const today=new Date().toLocaleDateString('en-GB',{day:'numeric',month:'long',year:'numeric'});
+ 
+  const certSection = passed ? `
+      <div class="cert">
+        <div class="cert-ttl">📜 Certificate of Completion</div>
+        <div class="cert-name">LSC 1103 — Report Writing Quiz</div>
+        <div class="cert-det">Score: ${score}/${TOTAL} (${pct}%) · Date: ${today}</div>
+        <div class="cert-det">Higher Colleges of Technology · Designed by: Nazila Motahari</div>
+      </div>` : `
+      <div style="background:#FEF2F2;border:2px solid #FECACA;border-radius:14px;padding:22px 24px;margin:18px 0;text-align:center">
+        <div style="font-size:2.5rem;margin-bottom:10px">🔒</div>
+        <div style="font-family:'Fredoka One',sans-serif;font-size:1.2rem;color:#991B1B;margin-bottom:8px">Certificate Not Awarded</div>
+        <div style="font-size:.9rem;font-weight:700;color:#7F1D1D;line-height:1.6">You need <strong>80% or above</strong> to earn your certificate.<br>You scored <strong>${pct}%</strong> — you need <strong>${80 - pct}% more</strong> to pass.<br><br>Review the modules below and try again. You can do it! 💪</div>
+      </div>`;
+ 
+  const actionBtns = passed ? `
+        <button class="btn-res print" onclick="window.print()">🖨️ Print Certificate</button>
+        <button class="btn-res restart" onclick="restartQuiz()">🔄 Try Again</button>` : `
+        <button class="btn-res restart" style="background:var(--sec);font-size:1rem;padding:14px 36px" onclick="restartQuiz()">🔄 Redo the Quiz</button>`;
  
   document.getElementById('results').style.display='block';
   document.getElementById('results').innerHTML=`
@@ -833,16 +852,8 @@ function showResults(){
       <div class="pct-bg"><div class="pct-fill" id="pBar" style="width:0%"></div></div>
       <div class="grade-lbl" style="color:${col}">${grade}</div>
       <div class="breakdown">${bd}</div>
-      <div class="cert">
-        <div class="cert-ttl">📜 Certificate of Completion</div>
-        <div class="cert-name">LSC 1103 — Report Writing Quiz</div>
-        <div class="cert-det">Score: ${score}/${TOTAL} (${pct}%) · Date: ${today}</div>
-        <div class="cert-det">Higher Colleges of Technology · Designed by: Nazila Motahari</div>
-      </div>
-      <div class="res-btns">
-        <button class="btn-res print" onclick="window.print()">🖨️ Print / Save</button>
-        <button class="btn-res restart" onclick="restartQuiz()">🔄 Try Again</button>
-      </div>
+      ${certSection}
+      <div class="res-btns">${actionBtns}</div>
     </div>`;
   setTimeout(()=>{document.getElementById('pBar').style.width=pct+'%';},100);
   document.getElementById('progFill').style.width='100%';

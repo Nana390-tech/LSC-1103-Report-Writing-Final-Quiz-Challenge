@@ -1,0 +1,865 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Report Writing Quiz | LSC 1103</title>
+<link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800;900&family=Fredoka+One&display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --pri:#2E7D52;--pri-d:#1A5C3A;--pri-l:#A8D5B8;
+  --sec:#8B6BB5;--sec-d:#6B4F95;
+  --acc:#7B5FB4;--acc-l:#EDE8F8;
+  --bg:#F2EEF8;--bg2:#EAE2F5;--bg3:#DDD4EF;
+  --white:#fff;--text:#1E1A2E;--mid:#5A4878;--light:#9080B8;
+  --ok:#22C55E;--ok-bg:#F0FDF4;--ok-b:#BBF7D0;
+  --err:#EF4444;--err-bg:#FEF2F2;--err-b:#FECACA;
+  --shadow:0 4px 24px rgba(46,125,82,.15);--r:14px;
+}
+body{font-family:'Nunito',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;overflow-x:hidden}
+#hdr{background:linear-gradient(135deg,var(--pri-d),var(--pri) 60%,#3D9E68);color:white;padding:14px 24px;display:flex;align-items:center;justify-content:space-between;gap:12px;position:sticky;top:0;z-index:100;box-shadow:0 2px 12px rgba(0,0,0,.25)}
+.hdr-left h1{font-family:'Fredoka One',sans-serif;font-size:1.25rem}
+.hdr-left p{font-size:.72rem;opacity:.8;margin-top:2px}
+.score-pill{background:var(--sec);color:white;font-family:'Fredoka One',sans-serif;font-size:1.1rem;padding:6px 16px;border-radius:99px;white-space:nowrap}
+#prog-wrap{background:var(--bg3);padding:12px 24px;border-bottom:2px solid var(--pri-l)}
+.prog-top{display:flex;justify-content:space-between;margin-bottom:7px;font-size:.8rem;font-weight:700;color:var(--mid)}
+.prog-bar-bg{height:10px;background:#c8b8e0;border-radius:99px;overflow:hidden}
+.prog-fill{height:100%;background:linear-gradient(90deg,var(--pri-d),var(--pri));border-radius:99px;transition:width .5s}
+#quiz-area{max-width:760px;margin:0 auto;padding:24px 20px 60px}
+.q-card{background:var(--white);border-radius:var(--r);box-shadow:var(--shadow);padding:28px;border:2px solid var(--bg3);animation:cardIn .3s ease}
+@keyframes cardIn{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:translateY(0)}}
+.q-num{font-size:.74rem;font-weight:800;color:var(--light);letter-spacing:.5px;margin-bottom:8px;text-transform:uppercase}
+.q-stem{font-size:1.05rem;font-weight:700;line-height:1.6;margin-bottom:18px}
+.q-stem em{background:var(--bg3);font-style:normal;font-weight:800;padding:2px 6px;border-radius:5px;color:var(--pri)}
+/* MCQ */
+.opt-grid{display:flex;flex-direction:column;gap:9px}
+.opt{display:flex;align-items:flex-start;gap:11px;padding:13px 15px;border-radius:10px;border:2px solid #E8DDD8;background:var(--bg);cursor:pointer;transition:all .2s;font-size:.93rem;font-weight:600;text-align:left;width:100%}
+.opt:hover:not(.locked){border-color:var(--pri);background:var(--bg3);transform:translateX(3px)}
+.opt-let{min-width:26px;height:26px;border-radius:7px;background:var(--bg3);color:var(--mid);display:flex;align-items:center;justify-content:center;font-weight:800;font-size:.82rem;flex-shrink:0}
+.opt.correct{border-color:var(--ok);background:var(--ok-bg);color:#166534}.opt.correct .opt-let{background:var(--ok);color:white}
+.opt.wrong{border-color:var(--err);background:var(--err-bg);color:#991B1B}.opt.wrong .opt-let{background:var(--err);color:white}
+.opt.dim{opacity:.4}.opt.locked{cursor:default}
+/* T/F */
+.tf-row{display:flex;gap:12px}
+.tf-btn{flex:1;padding:16px;border-radius:10px;border:2px solid #E8DDD8;background:var(--bg);cursor:pointer;font-family:'Fredoka One',sans-serif;font-size:1.1rem;transition:all .2s;text-align:center}
+.tf-btn.true-btn:hover:not(.locked){border-color:var(--ok);background:var(--ok-bg);color:#166534}
+.tf-btn.false-btn:hover:not(.locked){border-color:var(--err);background:var(--err-bg);color:#991B1B}
+.tf-btn.correct{border-color:var(--ok);background:var(--ok-bg);color:#166534}
+.tf-btn.wrong{border-color:var(--err);background:var(--err-bg);color:#991B1B}
+.tf-btn.locked{cursor:default}
+/* DROPDOWN */
+.gap-sent{font-size:1rem;font-weight:600;line-height:2.4;background:var(--bg);border-radius:10px;padding:14px 16px;border:2px solid var(--bg3);margin-bottom:10px}
+.gap-sel{appearance:none;background:var(--bg2);border:2px solid var(--pri-l);border-radius:8px;padding:5px 12px;font-family:'Nunito',sans-serif;font-weight:700;font-size:.88rem;color:var(--pri-d);cursor:pointer;margin:0 3px;vertical-align:middle}
+.gap-sel:focus{outline:none;border-color:var(--pri)}
+.gap-sel.correct{background:var(--ok-bg);border-color:var(--ok);color:#166534}
+.gap-sel.wrong{background:var(--err-bg);border-color:var(--err);color:#991B1B}
+.correct-hint{font-size:.8rem;font-weight:800;color:var(--ok);margin-left:6px}
+.word-bank{display:flex;flex-wrap:wrap;gap:6px;margin-top:10px}
+.wb-tag{background:var(--bg3);color:var(--mid);border:1px solid var(--pri-l);border-radius:6px;padding:3px 9px;font-size:.8rem;font-weight:700}
+/* PIE CHART */
+.pie-box{background:var(--bg);border:2px solid var(--bg3);border-radius:12px;padding:14px;margin-bottom:14px;text-align:center}
+.pie-title{font-size:.78rem;font-weight:800;color:var(--mid);text-transform:uppercase;letter-spacing:.5px;margin-bottom:8px}
+/* CHART WRITE */
+.chart-frame{background:var(--bg3);border-left:4px solid var(--pri);border-radius:0 10px 10px 0;padding:12px 14px;margin-bottom:12px;font-size:.88rem;font-weight:700;color:var(--mid);line-height:1.7}
+.chart-frame strong{color:var(--pri-d)}
+textarea.q-ta{width:100%;min-height:80px;border-radius:10px;border:2px solid var(--pri-l);padding:12px;font-family:'Nunito',sans-serif;font-size:.95rem;font-weight:600;color:var(--text);background:var(--bg);resize:vertical}
+textarea.q-ta:focus{outline:none;border-color:var(--pri)}
+.model-box{display:none;background:var(--ok-bg);border:2px solid var(--ok-b);border-radius:10px;padding:14px 16px;margin-top:12px}
+.model-box.on{display:block}
+.model-ttl{font-weight:800;color:#166534;font-size:.82rem;text-transform:uppercase;letter-spacing:.5px;margin-bottom:8px}
+.model-sent{font-size:.95rem;font-weight:700;color:#166534;font-style:italic;margin-bottom:10px;padding:8px 12px;background:white;border-radius:8px;border:1px solid var(--ok-b)}
+.checklist{margin-bottom:12px}
+.checklist li{list-style:none;font-size:.82rem;color:var(--mid);font-weight:600;padding:2px 0}
+.checklist li::before{content:"✓ ";color:var(--ok);font-weight:800}
+.selfmark-row{display:flex;gap:10px;flex-wrap:wrap}
+.sm-btn{flex:1;min-width:130px;padding:10px;border-radius:9px;border:none;font-family:'Nunito',sans-serif;font-weight:800;font-size:.85rem;cursor:pointer;transition:all .2s}
+.sm-yes{background:var(--ok-bg);border:2px solid var(--ok-b);color:#166534}.sm-yes:hover{background:#bbf7d0}
+.sm-no{background:var(--err-bg);border:2px solid var(--err-b);color:#991B1B}.sm-no:hover{background:#fecaca}
+/* MATCHING */
+.match-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:4px}
+.match-col{display:flex;flex-direction:column;gap:7px}
+.match-hdr{font-size:.7rem;font-weight:800;text-transform:uppercase;letter-spacing:.5px;color:var(--light);text-align:center;padding-bottom:4px;border-bottom:2px dashed var(--pri-l)}
+.m-it{padding:9px 12px;border-radius:9px;border:2px solid #E8DDD8;background:var(--bg);cursor:pointer;font-size:.84rem;font-weight:700;text-align:center;transition:all .2s;min-height:42px;display:flex;align-items:center;justify-content:center;line-height:1.3}
+.m-it:hover:not(.locked){border-color:var(--pri);background:var(--bg3)}
+.m-it.sel{border-color:var(--pri);background:var(--pri);color:white}
+.m-it.matched{border-color:var(--acc);background:var(--acc-l);color:var(--acc);cursor:default}
+.m-it.err{border-color:var(--err);background:var(--err-bg);animation:shk .3s ease}
+.m-it.locked{cursor:default}
+@keyframes shk{0%,100%{transform:translateX(0)}25%{transform:translateX(-5px)}75%{transform:translateX(5px)}}
+.match-info{text-align:center;margin-top:10px;font-size:.82rem;font-weight:700;color:var(--acc);background:var(--acc-l);border-radius:7px;padding:7px 12px}
+/* ORDERING */
+.ord-lbl{font-size:.75rem;font-weight:800;text-transform:uppercase;letter-spacing:.5px;color:var(--light);margin-bottom:7px}
+.ord-placed{border-radius:10px;background:var(--bg);border:2px dashed var(--pri-l);padding:12px;min-height:54px;display:flex;flex-wrap:wrap;gap:7px;align-content:flex-start;margin-bottom:12px}
+.ord-placed.empty::after{content:"Click words below to build your answer…";font-size:.83rem;color:var(--light);font-weight:600}
+.wchips{display:flex;flex-wrap:wrap;gap:7px}
+.wc{background:var(--bg3);border:2px solid var(--pri-l);color:var(--pri-d);border-radius:8px;padding:7px 13px;font-weight:700;font-size:.88rem;cursor:pointer;transition:all .18s;user-select:none}
+.wc:hover:not(.used){background:var(--pri);border-color:var(--pri);color:white;transform:translateY(-2px)}
+.wc.used{opacity:.3;cursor:default}
+.wc.placed{background:var(--acc);border-color:var(--acc);color:white;cursor:pointer}
+.wc.placed:hover{background:var(--pri-d);border-color:var(--pri-d)}
+/* ODD ONE OUT */
+.odd-grid{display:grid;grid-template-columns:1fr 1fr;gap:9px}
+.odd-opt{padding:13px;border-radius:10px;border:2px solid #E8DDD8;background:var(--bg);cursor:pointer;font-weight:700;font-size:.9rem;text-align:center;transition:all .2s;line-height:1.4}
+.odd-opt:hover:not(.locked){border-color:var(--pri);background:var(--bg3);transform:translateY(-2px)}
+.odd-opt.correct{border-color:var(--ok);background:var(--ok-bg);color:#166534}
+.odd-opt.wrong{border-color:var(--err);background:var(--err-bg);color:#991B1B}
+.odd-opt.dim{opacity:.38}.odd-opt.locked{cursor:default}
+/* FEEDBACK */
+#feedback{margin-top:16px;padding:14px 16px;border-radius:10px;font-weight:700;font-size:.88rem;line-height:1.6;display:none}
+#feedback.ok{display:block;background:var(--ok-bg);border:2px solid var(--ok-b);color:#166534}
+#feedback.err{display:block;background:var(--err-bg);border:2px solid var(--err-b);color:#991B1B}
+.fb-explain{display:block;margin-top:5px;font-weight:600;color:var(--mid);font-size:.83rem;line-height:1.55}
+/* NAV */
+.nav-row{display:flex;gap:11px;margin-top:20px;justify-content:flex-end;flex-wrap:wrap}
+.btn{padding:11px 22px;border-radius:10px;border:none;font-family:'Nunito',sans-serif;font-weight:800;font-size:.88rem;cursor:pointer;transition:all .2s}
+.btn-ch{background:var(--pri);color:white;box-shadow:0 4px 12px rgba(200,86,46,.3)}
+.btn-ch:hover{background:var(--pri-d);transform:translateY(-2px)}
+.btn-ch:disabled{background:#ccc;cursor:default;box-shadow:none;transform:none}
+.btn-nx{background:var(--sec);color:white;box-shadow:0 4px 12px rgba(139,107,181,.3)}
+.btn-nx:hover{background:var(--sec-d);transform:translateY(-2px)}
+/* RESULTS */
+#results{display:none;max-width:760px;margin:0 auto;padding:28px 20px 80px}
+.res-card{background:var(--white);border-radius:var(--r);box-shadow:var(--shadow);padding:36px;border:2px solid var(--bg3);text-align:center}
+.res-emoji{font-size:4rem;display:block;margin-bottom:12px}
+.res-title{font-family:'Fredoka One',sans-serif;font-size:2rem;color:var(--pri);margin-bottom:6px}
+.res-sub{color:var(--mid);font-weight:600;margin-bottom:22px;font-size:.92rem}
+.score-big{font-family:'Fredoka One',sans-serif;font-size:3.5rem;color:var(--pri-d);line-height:1}
+.score-den{font-size:1.5rem;color:var(--light)}
+.pct-bg{background:#c8b8e0;border-radius:99px;height:16px;overflow:hidden;margin:18px 0 8px}
+.pct-fill{height:100%;border-radius:99px;transition:width 1s;background:linear-gradient(90deg,var(--sec-d),var(--pri))}
+.grade-lbl{font-family:'Fredoka One',sans-serif;font-size:1.1rem;margin-bottom:22px}
+.breakdown{display:grid;grid-template-columns:repeat(auto-fill,minmax(185px,1fr));gap:9px;margin-bottom:26px;text-align:left}
+.bd-it{background:var(--bg);border-radius:10px;padding:11px 13px;border:2px solid var(--bg3)}
+.bd-mod{font-size:.68rem;font-weight:800;text-transform:uppercase;letter-spacing:.5px;color:var(--light);margin-bottom:3px}
+.bd-sc{font-family:'Fredoka One',sans-serif;font-size:1.15rem;color:var(--pri-d)}
+.bd-of{font-size:.72rem;color:var(--light)}
+.cert{border:3px solid var(--sec);border-radius:var(--r);padding:18px;margin:18px 0;background:linear-gradient(135deg,#f0ebfa,#e8e0f5)}
+.cert-ttl{font-family:'Fredoka One',sans-serif;font-size:.95rem;color:var(--sec-d);letter-spacing:2px;text-transform:uppercase;margin-bottom:4px}
+.cert-name{font-size:1rem;font-weight:700;margin-bottom:4px}
+.cert-det{font-size:.78rem;color:var(--mid)}
+.res-btns{display:flex;gap:12px;justify-content:center;flex-wrap:wrap;margin-top:16px}
+.btn-res{padding:13px 26px;border-radius:10px;border:none;font-family:'Nunito',sans-serif;font-weight:800;font-size:.92rem;cursor:pointer;box-shadow:var(--shadow)}
+.btn-res.restart{background:var(--pri);color:white}.btn-res.restart:hover{background:var(--pri-d)}
+.btn-res.print{background:var(--sec);color:white}.btn-res.print:hover{background:var(--sec-d)}
+.star{color:var(--sec)}
+@media(max-width:560px){
+  .match-grid,.odd-grid{grid-template-columns:1fr}
+  .tf-row{flex-direction:column}
+  #hdr{flex-direction:column;text-align:center;gap:8px}
+}
+</style>
+</head>
+<body>
+ 
+<div id="hdr">
+  <div class="hdr-left">
+    <h1>📋 Report Writing Quiz</h1>
+    <p>LSC 1103 · Professional Written Communication · HCT &nbsp;|&nbsp; ✨ Designed by: Nazila Motahari</p>
+  </div>
+  <div class="score-pill">⭐ <span id="scoreDisp">0</span> / <span id="totDisp">50</span></div>
+</div>
+ 
+<div id="prog-wrap">
+  <div class="prog-top">
+    <span id="progLbl">Question 1 of 50</span>
+    <span id="modLbl">Module: What is a Report?</span>
+  </div>
+  <div class="prog-bar-bg"><div class="prog-fill" id="progFill" style="width:0%"></div></div>
+</div>
+ 
+<div id="quiz-area">
+  <div class="q-card" id="qCard">
+    <div id="qInner"></div>
+    <div id="feedback"></div>
+    <div class="nav-row">
+      <button class="btn btn-ch" id="checkBtn" onclick="checkAnswer()">Check Answer ✓</button>
+      <button class="btn btn-nx" id="nextBtn" onclick="nextQ()" style="display:none">Next Question →</button>
+    </div>
+  </div>
+</div>
+ 
+<div id="results"></div>
+ 
+<script>
+// ═══════════════════════════════════════════
+//  PIE CHART SVG GENERATOR
+// ═══════════════════════════════════════════
+function genPie(segs,W=310,H=285,cx=150,cy=135,r=108){
+  const tot=segs.reduce((s,g)=>s+g.v,0);
+  let paths='',pcts='',leg='',a=-Math.PI/2;
+  segs.forEach((g,i)=>{
+    const fr=g.v/tot,sw=fr*2*Math.PI,ea=a+sw;
+    const x1=(cx+r*Math.cos(a)).toFixed(1),y1=(cy+r*Math.sin(a)).toFixed(1);
+    const x2=(cx+r*Math.cos(ea)).toFixed(1),y2=(cy+r*Math.sin(ea)).toFixed(1);
+    paths+=`<path d="M${cx},${cy}L${x1},${y1}A${r},${r} 0 ${sw>Math.PI?1:0},1 ${x2},${y2}Z" fill="${g.c}" stroke="white" stroke-width="2.5"/>`;
+    const ma=a+sw/2,lr=r*.63;
+    pcts+=`<text x="${(cx+lr*Math.cos(ma)).toFixed(1)}" y="${(cy+lr*Math.sin(ma)).toFixed(1)}" text-anchor="middle" dominant-baseline="middle" fill="white" font-size="13" font-weight="800" font-family="Nunito,sans-serif">${Math.round(fr*100)}%</text>`;
+    const row=Math.floor(i/2),col=i%2,lx=6+col*152,ly=H-66+row*23;
+    leg+=`<rect x="${lx}" y="${ly}" width="12" height="12" rx="3" fill="${g.c}"/><text x="${lx+16}" y="${ly+10}" font-size="11" fill="#5C3D2E" font-weight="700" font-family="Nunito,sans-serif">${g.label}</text>`;
+    a=ea;
+  });
+  return `<svg viewBox="0 0 ${W} ${H}" xmlns="http://www.w3.org/2000/svg" style="max-width:100%;display:block;margin:0 auto">${paths}${pcts}${leg}</svg>`;
+}
+const PIE = genPie([
+  {label:'📧 Email',v:45,c:'#2E7D52'},
+  {label:'🗣 Face-to-face',v:30,c:'#8B6BB5'},
+  {label:'📝 Written comments',v:15,c:'#5BA88A'},
+  {label:'💻 Online portal',v:10,c:'#C4AEE8'}
+]);
+ 
+// ═══════════════════════════════════════════
+//  QUESTION BANK — 50 Questions
+// ═══════════════════════════════════════════
+const QS=[
+// ── MCQ × 16 ──────────────────────────────
+{id:1,type:'mcq',mod:'What is a Report?',
+ stem:'What is the <em>main purpose</em> of writing a formal report?',
+ opts:['To express personal feelings and opinions','To present factual information in an organized way','To entertain the reader with a story','To practise creative writing skills'],
+ ans:1,fb:'A formal report presents factual, organized information to a specific audience for a specific purpose — it is never personal or creative writing.'},
+ 
+{id:2,type:'mcq',mod:'What is a Report?',
+ stem:'Which of the following is a key <em>characteristic</em> of a formal report?',
+ opts:['Written using "I" and "we" throughout','Includes personal stories and emotions','Has clear headings, sections, and objective language','Does not need to be factually accurate'],
+ ans:2,fb:'Formal reports use clear structure, numbered headings, and objective (impersonal) language. They present facts, not personal views.'},
+ 
+{id:3,type:'mcq',mod:'Report Types',
+ stem:'Which type of report <em>identifies a problem</em>, analyzes its causes, and ends with recommendations for solving it?',
+ opts:['Informative report','Evaluation study report','Problem-solving report','Narrative report'],
+ ans:2,fb:'A problem-solving report: (1) describes the problem, (2) analyzes why it happens, and (3) recommends solutions. It always ends with recommendations.'},
+ 
+{id:4,type:'mcq',mod:'Report Types',
+ stem:'The college wants to compare three different canteen suppliers and recommend the best one based on price, quality, and hygiene. Which report type should they commission?',
+ opts:['Informative report','Problem-solving report','Evaluation study report','Progress report'],
+ ans:2,fb:'An evaluation study report weighs options against set criteria and recommends the best choice. It helps readers make an evidence-based decision.'},
+ 
+{id:5,type:'mcq',mod:'Writing Titles',
+ stem:'Which report title is written <em>correctly</em>?',
+ opts:['a report about students at HCT','REPORT ABOUT STUDENT SATISFACTION 2024','A Report on Student Satisfaction at HCT, 2024','report on students satisfaction hct 2024'],
+ ans:2,fb:'Correct titles use Title Case, include the topic, organization, and year: "A Report on [Topic] at [Organization], [Year]."'},
+ 
+{id:6,type:'mcq',mod:'The Introduction',
+ stem:'Which sentence belongs in the <em>PURPOSE</em> section of a report introduction?',
+ opts:['This report is divided into three main sections.','Data was collected using a questionnaire given to 100 students.','This report aims to investigate student satisfaction at HCT.','In conclusion, students are generally satisfied with the college.'],
+ ans:2,fb:'The purpose states WHY the report was written. It starts with "This report aims to..." or "The purpose of this report is to investigate..."'},
+ 
+{id:7,type:'mcq',mod:'The Introduction',
+ stem:'How many elements should a well-written report introduction contain?',
+ opts:['2 — Purpose and Conclusion','3 — Purpose, Scope, and Method','4 — Purpose, Scope, Method, and Outline','6 — one element per report section'],
+ ans:2,fb:'A complete report introduction has exactly 4 elements: (1) Purpose, (2) Scope, (3) Method, and (4) Outline/Overview of the report structure.'},
+ 
+{id:8,type:'mcq',mod:'Reading Charts',
+ stem:'A student wants to show <em>what percentage</em> of respondents chose each feedback method. Which chart type is most appropriate?',
+ opts:['Bar chart — to show comparisons','Line chart — to show trends over time','Pie chart — to show parts of a whole','Flow chart — to show a process'],
+ ans:2,fb:'Pie charts show proportions and percentages (parts of a whole). Use bar charts for comparisons and line charts for changes over time.'},
+ 
+{id:9,type:'mcq',mod:'Findings & Analysis',
+ stem:'Which phrase is most appropriate to <em>introduce a finding</em> in a formal report?',
+ opts:['"I found out that a lot of students like the library..."','"Obviously, everyone already knows that..."','"As shown in Figure 1, the majority of respondents..."','"It kind of seems like students maybe prefer..."'],
+ ans:2,fb:'"As shown in Figure 1, the majority of respondents..." is formal, impersonal, and cites evidence — exactly right for a Findings section.'},
+ 
+{id:10,type:'mcq',mod:'Conclusion & Recommendations',
+ stem:'Which sentence correctly introduces a <em>recommendation</em>?',
+ opts:['"I personally think the college should buy more computers."','"It is recommended that the college invest in additional computer labs."','"Everyone agrees that more computers are obviously needed."','"The college should probably consider getting more computers."'],
+ ans:1,fb:'Recommendations use the impersonal passive: "It is recommended that + [subject] + [base verb]." This keeps the language formal and objective.'},
+ 
+{id:11,type:'mcq',mod:'Vocabulary',
+ stem:'What does <em>"compile"</em> mean in the context of report writing?',
+ opts:['To argue against a point of view','To gather and organize information into one document','To proofread and correct grammar errors','To delete unnecessary sections of a report'],
+ ans:1,fb:'"Compile" means to collect and organize data or information from multiple sources into a single document — a key skill in report writing.'},
+ 
+{id:12,type:'mcq',mod:'Vocabulary',
+ stem:'Which is the correct <em>formal alternative</em> to the phrasal verb "find out"?',
+ opts:['look up','check out','investigate','figure out'],
+ ans:2,fb:'"Investigate" is the formal equivalent of "find out." Avoid two-word phrasal verbs in formal reports — they sound informal.'},
+ 
+{id:13,type:'mcq',mod:'Report Types',
+ stem:'Which scenario best matches an <em>informative report</em>?',
+ opts:['A report recommending which new software the IT department should purchase','A report analyzing why student attendance has dropped and proposing solutions','A report presenting data on library usage patterns at HCT last semester','A report comparing two canteen suppliers on cost and hygiene criteria'],
+ ans:2,fb:'An informative report presents facts and data only — no analysis of causes, no recommendations. It informs the reader rather than arguing or recommending.'},
+ 
+{id:14,type:'mcq',mod:'The Introduction',
+ stem:'Which sentence correctly describes the <em>SCOPE</em> of a report?',
+ opts:['"This report aims to examine canteen satisfaction among students."','"A questionnaire was distributed to 150 students in January 2024."','"This report covers only full-time undergraduate students and excludes staff."','"The report is organized into four main sections."'],
+ ans:2,fb:'The scope defines the boundaries: WHAT is included and WHAT is excluded. It makes the limits of the investigation clear to the reader.'},
+ 
+{id:15,type:'mcq',mod:'Reading Charts',
+ stem:'Which phrase best describes a <em>downward trend</em> in a bar chart?',
+ opts:['"Sales rose significantly between 2022 and 2024."','"The figures remained stable throughout the period."','"The number of students declined sharply between 2022 and 2024."','"Results showed a slight fluctuation over the period."'],
+ ans:2,fb:'"Declined sharply" correctly describes a clear downward trend. Vocabulary: declined/fell/dropped (↓), rose/increased/grew (↑), remained stable/steady (→).'},
+ 
+{id:16,type:'mcq',mod:'Findings & Analysis',
+ stem:'What is the key difference between an <em>informative</em> and a <em>problem-solving</em> report?',
+ opts:['An informative report is always shorter.','An informative report presents facts only; a problem-solving report analyzes a problem and recommends solutions.','A problem-solving report does not need an introduction.','Both types always end with recommendations.'],
+ ans:1,fb:'Informative = facts only. Problem-solving = facts + analysis of causes + recommendations. They have fundamentally different purposes and structures.'},
+ 
+// ── TRUE/FALSE × 9 ────────────────────────
+{id:17,type:'tf',mod:'What is a Report?',
+ stem:'A formal report should be written using "I think" and "In my opinion."',
+ ans:false,fb:'FALSE ✗ — Formal reports use objective, impersonal language. Replace "I think" with "The data suggests..." or "It appears that..."'},
+ 
+{id:18,type:'tf',mod:'Report Types',
+ stem:'A problem-solving report always ends with recommendations for solving the identified problem.',
+ ans:true,fb:'TRUE ✓ — The structure is: identify the problem → analyze causes → recommend solutions. Recommendations are an essential final element.'},
+ 
+{id:19,type:'tf',mod:'Writing Titles',
+ stem:'A good report title should include the topic, the organization, and the time period.',
+ ans:true,fb:'TRUE ✓ — A well-written title includes WHAT (topic), WHERE (organization/location), and WHEN (year or period).'},
+ 
+{id:20,type:'tf',mod:'The Introduction',
+ stem:'The introduction of a report should include the main findings and conclusions.',
+ ans:false,fb:'FALSE ✗ — The introduction only sets up the report (purpose, scope, method, overview). Findings go in the Findings section. Conclusions go in their own section.'},
+ 
+{id:21,type:'tf',mod:'The Introduction',
+ stem:'The "scope" section tells the reader what topics the report covers AND what it does NOT cover.',
+ ans:true,fb:'TRUE ✓ — Scope defines the boundaries. E.g.: "This report covers full-time students only and does not include part-time or online students."'},
+ 
+{id:22,type:'tf',mod:'Conclusion & Recommendations',
+ stem:'The conclusion section is the correct place to introduce new data and new arguments.',
+ ans:false,fb:'FALSE ✗ — No new information should appear in the conclusion. It summarizes what was found and answers the purpose stated in the introduction.'},
+ 
+{id:23,type:'tf',mod:'Vocabulary',
+ stem:'Words like "kids," "stuff," and "a lot of" are acceptable in a formal report.',
+ ans:false,fb:'FALSE ✗ — Use formal vocabulary: "students/children" not "kids," "materials/equipment" not "stuff," "numerous/many" not "a lot of."'},
+ 
+{id:24,type:'tf',mod:'Report Types',
+ stem:'An evaluation study report can only include a recommendation if the evidence is 100% conclusive.',
+ ans:false,fb:'FALSE ✗ — Evaluation reports weigh evidence and make the best-supported recommendation. Perfect certainty is not required — evidence-based judgment is.'},
+ 
+{id:25,type:'tf',mod:'Findings & Analysis',
+ stem:'In the Findings section, you should include your personal opinion about the data.',
+ ans:false,fb:'FALSE ✗ — The Findings section presents data objectively. Never use "I think" or "I believe" anywhere in a formal report.'},
+ 
+// ── GAP-FILL DROPDOWN × 11 ────────────────
+// NOTE: opts arrays are shuffled on render so correct answer is NOT always first
+{id:26,type:'drop',mod:'Report Types',
+ before:'A report that presents facts and information without analysis or recommendations is called',
+ blank:'___',after:'report.',
+ opts:['a problem-solving','an evaluation study','a summary','an informative'],
+ ans:'an informative',
+ fb:'An informative report presents data and facts only — no recommendations, no analysis of causes. It informs rather than argues or recommends.'},
+ 
+{id:27,type:'drop',mod:'Writing Titles',
+ before:'The 5W+1H title formula includes: Who, What, When, Where, Why, and',
+ blank:'___',after:'. Use this checklist when writing any report title.',
+ opts:['Whose','Whether','Which','How'],
+ ans:'How',
+ fb:'5W+1H = Who, What, When, Where, Why, How. Use this as a checklist to make sure your report title contains all the necessary information.'},
+ 
+{id:28,type:'drop',mod:'The Introduction',
+ before:'The',
+ blank:'___',after:'section of the introduction explains how the data was collected — for example, through surveys, interviews, or secondary research.',
+ opts:['conclusion','purpose','overview','method'],
+ ans:'method',
+ fb:'The METHOD section describes HOW you gathered your data. It typically comes third in the introduction, after purpose and scope.'},
+ 
+{id:29,type:'drop',mod:'The Introduction',
+ before:'This report covers',
+ blank:'___',after:'students at HCT Abu Dhabi only and does not include staff or part-time students.',
+ opts:['every kind of','all kinds of','interested','full-time undergraduate'],
+ ans:'full-time undergraduate',
+ fb:'The scope must be specific and precise. "Full-time undergraduate students" tells the reader exactly who was included and excludes all other groups.'},
+ 
+{id:30,type:'drop',mod:'Findings & Analysis',
+ before:'According to the survey,',
+ blank:'___',after:'of respondents (68%) reported satisfaction with the new library timetable.',
+ opts:['each','a few','the minority','the majority'],
+ ans:'the majority',
+ fb:'"The majority" (= more than half) is the correct formal expression. Always include the exact percentage in brackets immediately after.'},
+ 
+{id:31,type:'drop',mod:'Findings & Analysis',
+ before:'The data',
+ blank:'___',after:'that 45% of students experience difficulty managing their time during exam periods.',
+ opts:['hopes','says','thinks','indicates'],
+ ans:'indicates',
+ fb:'Use formal reporting verbs with data: "indicates," "reveals," "suggests," "shows." Never use "says," "thinks," or "hopes" to describe what data shows.'},
+ 
+{id:32,type:'drop',mod:'Reading Charts',
+ before:'As shown in Figure 1, the number of library visits',
+ blank:'___',after:'significantly between 2021 and 2023, from 200 to over 850 visits per week.',
+ opts:['remained stable','decreased','fluctuated','increased'],
+ ans:'increased',
+ fb:'"Increased" (or "rose/grew") describes an upward trend. The numbers confirm it: rising from 200 to 850 is a dramatic increase.'},
+ 
+{id:33,type:'drop',mod:'Conclusion & Recommendations',
+ before:'In conclusion, this report has',
+ blank:'___',after:'the main factors that affect student wellbeing at HCT and their impact on academic performance.',
+ opts:['invented','argued with','ignored','examined'],
+ ans:'examined',
+ fb:'"Examined" (or "outlined," "identified," "investigated") is a formal verb appropriate for conclusion sentences that recap the report\'s scope.'},
+ 
+{id:34,type:'drop',mod:'Conclusion & Recommendations',
+ before:'It is',
+ blank:'___',after:'that the college extend library opening hours to 10pm during the exam period.',
+ opts:['told','asked','said','recommended'],
+ ans:'recommended',
+ fb:'"It is recommended that..." is the standard formal structure for recommendations. Follow it with: subject + base verb (no -s, no -ing).'},
+ 
+{id:35,type:'drop',mod:'Vocabulary',
+ before:'Rather than writing "a lot of problems," a formal report should use',
+ blank:'___',after:'"problems" to maintain a professional tone throughout.',
+ opts:['"loads of"','"tons of"','"plenty of"','"numerous"'],
+ ans:'"numerous"',
+ fb:'"Numerous" (or "several," "a significant number of," "many") is the formal alternative. Avoid informal quantifiers in all formal report writing.'},
+ 
+{id:36,type:'drop',mod:'Vocabulary',
+ before:'Instead of "The college should get better equipment," a formal recommendation reads: "It is recommended that the college',
+ blank:'___',after:'better equipment."',
+ opts:['gets','getting','got','acquire'],
+ ans:'acquire',
+ fb:'After "It is recommended that [subject]..." use the BASE FORM of the verb (no -s, no -ing). "Acquire" is also the formal alternative to the informal "get."'},
+ 
+// ── CHART GAP-FILL × 2 ────────────────────
+{id:37,type:'chartdrop',mod:'Reading Charts',
+ chartTitle:'📊 How HCT Students Prefer to Receive Feedback',
+ stem:'Study the pie chart carefully. Then complete the sentence.',
+ before:'According to the pie chart,',
+ blank:'___',after:'of students (45%) prefer to receive feedback by email — making it the most popular method overall.',
+ opts:['all','a few','the minority','the majority'],
+ ans:'the majority',
+ fb:'"The majority" = more than half. 45% is the largest single segment. Always include the percentage in brackets after the expression.'},
+ 
+{id:38,type:'chartdrop',mod:'Reading Charts',
+ chartTitle:'📊 How HCT Students Prefer to Receive Feedback',
+ stem:'Look at the smallest segment of the pie chart. Complete the sentence.',
+ before:'As the pie chart illustrates, receiving feedback through an online portal is the',
+ blank:'___',after:'popular method, with only 10% of students choosing it.',
+ opts:['very','most','second most','least'],
+ ans:'least',
+ fb:'"The least popular" describes the smallest segment (10%). Use "the most popular" for the largest, "the second most popular" for the second largest.'},
+ 
+// ── CHART WRITE × 1 (instructional) ───────
+{id:39,type:'chartwrite',mod:'Reading Charts',
+ chartTitle:'📊 How HCT Students Prefer to Receive Feedback',
+ stem:'Now look at the <em>face-to-face segment</em> (🗣 30%). Write ONE complete, formal sentence describing this finding as it would appear in a real report.',
+ frame:'💡 <strong>Sentence frame:</strong> "According to the pie chart, ___ of students (___%) prefer to receive feedback ___."',
+ model:'According to the pie chart, nearly a third of students (30%) prefer to receive feedback face-to-face.',
+ checklist:['Did you refer to the source? ("According to the pie chart...")','Did you include the exact percentage? (30%)','Did you use a quantity expression? ("nearly a third" / "almost one in three")','Did you use a formal verb? ("prefer" not "want")','Is your sentence grammatically complete and written in full?']},
+ 
+// ── MATCHING × 2 ──────────────────────────
+{id:40,type:'match',mod:'Report Structure',
+ stem:'Match each <em>report section</em> to its correct description.',
+ pairs:[
+   {L:'📋 Title',R:'Summarizes the topic, organization, and time period'},
+   {L:'📝 Introduction',R:'States the purpose, scope, method, and outline'},
+   {L:'🔬 Findings',R:'Presents and analyzes the collected data'},
+   {L:'✅ Conclusion',R:'Summarizes results — no new information here'},
+   {L:'💡 Recommendations',R:'Suggests actions using "It is recommended that..."'}
+ ],
+ fb:'Each section has a specific, non-interchangeable role. Getting the structure right is essential for a professional, well-organized report.'},
+ 
+{id:41,type:'match',mod:'Vocabulary',
+ stem:'Match each <em>informal word</em> to its formal equivalent suitable for use in a report.',
+ pairs:[
+   {L:'get',R:'obtain / receive'},
+   {L:'big',R:'significant / major'},
+   {L:'show',R:'demonstrate / indicate'},
+   {L:'enough',R:'sufficient'},
+   {L:'help',R:'assist / support'}
+ ],
+ fb:'Replacing informal words with formal equivalents is essential for professional report writing. Formal language sounds objective and credible.'},
+ 
+// ── SENTENCE ORDERING × 4 ─────────────────
+{id:42,type:'order',mod:'Writing Titles',
+ stem:'Arrange these parts in the correct order to form a <em>well-structured report title</em>.',
+ words:['at HCT','A Report on','Abu Dhabi','Student Satisfaction','2024'],
+ ans:['A Report on','Student Satisfaction','at HCT','Abu Dhabi','2024'],
+ fb:'Correct formula: "A Report on [Topic] at [Organization + Location], [Year]." Use Title Case and always include topic, organization, and year.'},
+ 
+{id:43,type:'order',mod:'Findings & Analysis',
+ stem:'Arrange these words in the correct order to make a formal <em>findings sentence</em>.',
+ words:['indicate','72% of students','online resources','The results','prefer','that'],
+ ans:['The results','indicate','that','72% of students','prefer','online resources'],
+ fb:'Structure: [Subject] + [reporting verb] + "that" + [finding]. Always put the reporting verb before "that" in formal findings sentences.'},
+ 
+{id:44,type:'order',mod:'Conclusion & Recommendations',
+ stem:'Arrange these words to form a correct <em>recommendation sentence</em>.',
+ words:['the college','It','recommended','provide','is','that','additional study rooms'],
+ ans:['It','is','recommended','that','the college','provide','additional study rooms'],
+ fb:'"It is recommended that [subject] + [base verb]..." is the standard recommendation formula. The verb must be in base form (no -s, no -ing).'},
+ 
+{id:45,type:'order',mod:'The Introduction',
+ stem:'Arrange these words to make a correct <em>purpose statement</em> for a report introduction.',
+ words:['investigate','This report','student absenteeism','to','the main causes of','aims'],
+ ans:['This report','aims','to','investigate','the main causes of','student absenteeism'],
+ fb:'"This report aims to + [verb] + [topic]" is the standard purpose statement structure. "Investigate," "examine," and "explore" are all appropriate verbs here.'},
+ 
+// ── ODD ONE OUT / ERROR SPOT × 8 ──────────
+{id:46,type:'odd',mod:'Findings & Analysis',
+ stem:'Which word does <em>NOT belong</em> with the others? (Formal verbs for describing data in a Findings section)',
+ opts:['indicates','reveals','recommends','suggests'],
+ ans:2,fb:'"Recommends" belongs in the Recommendations section, not Findings. "Indicates," "reveals," and "suggests" are all used to describe what data shows.'},
+ 
+{id:47,type:'odd',mod:'Vocabulary',
+ stem:'Which word is <em>INFORMAL</em> and should NOT appear in a formal report?',
+ opts:['investigate','compile','stuff','demonstrate'],
+ ans:2,fb:'"Stuff" is informal. Use precise nouns: "materials," "data," "equipment," "information." All other options are formal vocabulary appropriate for reports.'},
+ 
+{id:48,type:'odd',mod:'Report Types',
+ stem:'Which report type is <em>NOT</em> one of the three types covered in this course?',
+ opts:['Informative report','Problem-solving report','Incident report','Evaluation study report'],
+ ans:2,fb:'"Incident report" is not taught in this course. The three types covered are: (1) Informative, (2) Problem-solving, and (3) Evaluation study reports.'},
+ 
+{id:49,type:'odd',mod:'Reading Charts',
+ stem:'Which word creates a <em>contradiction</em> in this sentence? → "The bar chart shows that enrolment remained stable dramatically in Q3."',
+ opts:['bar chart','shows','remained stable','dramatically'],
+ ans:3,fb:'"Dramatically" contradicts "remained stable." Use "dramatically/sharply/significantly" with rising or falling trends only. For stability, say "remained stable throughout" — no intensifier needed.'},
+ 
+{id:50,type:'odd',mod:'Vocabulary',
+ stem:'Which sentence uses language that is <em>too informal</em> for a formal report?',
+ opts:['"The findings demonstrate a significant increase in student engagement."','"It is recommended that the college introduce a mentoring programme."','"A lot of students think the library hours are way too short."','"The data indicates that 72% of respondents prefer morning classes."'],
+ ans:2,fb:'"A lot of students think the library hours are way too short" — "a lot of," "think," and "way too" are all informal. Replace with: "A significant number of students (X%) reported that library hours are insufficient."'},
+ 
+{id:51,type:'odd',mod:'Report Structure',
+ stem:'Which section of a formal report does <em>NOT belong</em> in the introduction?',
+ opts:['Purpose','Scope','Key Findings','Method'],
+ ans:2,fb:'"Key Findings" belongs in the Findings section — not the introduction. The introduction contains: Purpose, Scope, Method, and Outline only.'},
+ 
+{id:52,type:'odd',mod:'Conclusion & Recommendations',
+ stem:'Which sentence is <em>inappropriate</em> for a recommendations section?',
+ opts:['"It is recommended that the college provide a dedicated quiet study area."','"The college should consider extending canteen hours to 8pm on weekdays."','"I think they should just buy more chairs because it is obvious."','"It is suggested that the college survey students annually on facilities."'],
+ ans:2,fb:'"I think they should just buy more chairs because it is obvious" is far too informal and personal. Recommendations must use formal structures and never include "I think," "just," or "obvious."'},
+ 
+{id:53,type:'odd',mod:'The Introduction',
+ stem:'Which sentence does <em>NOT</em> belong in the METHOD section of a report?',
+ opts:['"A questionnaire was distributed to 120 students in March 2024."','"Data was also gathered from the HCT library database."','"In conclusion, students appear to be satisfied with current library facilities."','"Interviews were conducted with five department heads."'],
+ ans:2,fb:'"In conclusion, students appear to be satisfied..." is a conclusion — not a method description. The Method section describes only HOW data was collected, not what was found.'}
+];
+ 
+const TOTAL=QS.length;
+ 
+// ═══════════════════════════════════════════
+//  STATE
+// ═══════════════════════════════════════════
+let cur=0,score=0,answered=false;
+let selOpt=null,selTF=null,selOdd=null;
+let mSel=null,mPairs={},mRUsed=new Set(),mCorrect=0;
+let oPlaced=[],oAvail=[];
+let modSc={};
+QS.forEach(q=>{if(!modSc[q.mod])modSc[q.mod]={g:0,t:0}});
+ 
+// ═══════════════════════════════════════════
+//  UTILS
+// ═══════════════════════════════════════════
+const SH=arr=>[...arr].sort(()=>Math.random()-.5);
+const LL=i=>['A','B','C','D','E'][i];
+function showFB(ok,txt){
+  const el=document.getElementById('feedback');
+  el.className=ok?'ok':'err';
+  el.innerHTML=`<strong>${ok?'✅ Correct!':'❌ Not quite.'}</strong><span class="fb-explain">${txt}</span>`;
+}
+function lockNext(){
+  document.getElementById('checkBtn').style.display='none';
+  document.getElementById('nextBtn').style.display='';
+  answered=true;
+}
+function updProg(){
+  const pct=Math.round((cur/TOTAL)*100);
+  document.getElementById('progFill').style.width=pct+'%';
+  document.getElementById('progLbl').textContent=`Question ${Math.min(cur+1,TOTAL)} of ${TOTAL}`;
+  document.getElementById('modLbl').textContent=cur<TOTAL?`Module: ${QS[cur].mod}`:'Complete!';
+  document.getElementById('scoreDisp').textContent=score;
+  document.getElementById('totDisp').textContent=TOTAL;
+}
+ 
+// ═══════════════════════════════════════════
+//  RENDER
+// ═══════════════════════════════════════════
+function renderQ(){
+  const q=QS[cur];
+  answered=false;selOpt=null;selTF=null;selOdd=null;
+  mSel=null;mPairs={};mRUsed=new Set();mCorrect=0;
+  oPlaced=[];oAvail=[];
+ 
+  const fb=document.getElementById('feedback');
+  fb.className='';fb.innerHTML='';
+  const cb=document.getElementById('checkBtn');
+  cb.style.display='';cb.disabled=false;cb.textContent='Check Answer ✓';
+  document.getElementById('nextBtn').style.display='none';
+  updProg();
+ 
+  let h=`<div class="q-num">Q${q.id} of ${TOTAL} &nbsp;·&nbsp; <span class="star">★</span> ${q.mod}</div>
+          <div class="q-stem">${q.stem}</div>`;
+ 
+  if(q.type==='mcq'){
+    h+=`<div class="opt-grid">${q.opts.map((o,i)=>`<button class="opt" id="o${i}" onclick="pickOpt(${i})"><span class="opt-let">${LL(i)}</span>${o}</button>`).join('')}</div>`;
+    cb.disabled=true;
+  }
+  else if(q.type==='tf'){
+    h+=`<div class="tf-row"><button class="tf-btn true-btn" id="tft" onclick="pickTF(true)">✅ TRUE</button><button class="tf-btn false-btn" id="tff" onclick="pickTF(false)">❌ FALSE</button></div>`;
+    cb.disabled=true;
+  }
+  else if(q.type==='drop'){
+    const sh=SH(q.opts);
+    h+=`<div class="gap-sent">${q.before} <select class="gap-sel" id="ds"><option value="">— choose —</option>${sh.map(o=>`<option value="${o}">${o}</option>`).join('')}</select> ${q.after}</div>
+        <div class="word-bank">📌 Word bank: ${q.opts.map(o=>`<span class="wb-tag">${o}</span>`).join('')}</div>`;
+  }
+  else if(q.type==='chartdrop'){
+    const sh=SH(q.opts);
+    h+=`<div class="pie-box"><div class="pie-title">${q.chartTitle}</div>${PIE}</div>
+        <div class="gap-sent">${q.before} <select class="gap-sel" id="ds"><option value="">— choose —</option>${sh.map(o=>`<option value="${o}">${o}</option>`).join('')}</select> ${q.after}</div>
+        <div class="word-bank">📌 Word bank: ${q.opts.map(o=>`<span class="wb-tag">${o}</span>`).join('')}</div>`;
+  }
+  else if(q.type==='chartwrite'){
+    h+=`<div class="pie-box"><div class="pie-title">${q.chartTitle}</div>${PIE}</div>
+        <div class="chart-frame">${q.frame}</div>
+        <textarea class="q-ta" id="wta" placeholder="Write your complete sentence here…"></textarea>
+        <div class="model-box" id="mb">
+          <div class="model-ttl">✅ Model Answer</div>
+          <div class="model-sent" id="mSent"></div>
+          <ul class="checklist" id="mCL"></ul>
+          <div class="selfmark-row">
+            <button class="sm-btn sm-yes" onclick="selfMark(true)">✅ My sentence matches — mark it correct!</button>
+            <button class="sm-btn sm-no" onclick="selfMark(false)">❌ My sentence needs improvement</button>
+          </div>
+        </div>`;
+    cb.textContent='Reveal Model Answer 👁';
+  }
+  else if(q.type==='match'){
+    const lft=q.pairs.map(p=>p.L);
+    const rgt=SH(q.pairs.map(p=>p.R));
+    window._ML=lft;window._MR=rgt;
+    h+=`<div class="match-grid">
+      <div class="match-col"><div class="match-hdr">Column A — Terms</div>${lft.map((l,i)=>`<button class="m-it" id="mL${i}" onclick="mClick('L',${i})">${l}</button>`).join('')}</div>
+      <div class="match-col"><div class="match-hdr">Column B — Descriptions</div>${rgt.map((r,i)=>`<button class="m-it" id="mR${i}" onclick="mClick('R',${i})">${r}</button>`).join('')}</div>
+    </div>
+    <div class="match-info" id="mInfo">Click a term on the left, then its match on the right.</div>`;
+    cb.disabled=true;
+  }
+  else if(q.type==='order'){
+    oAvail=SH(q.words);
+    h+=`<div class="ord-lbl">Your answer — click to build:</div>
+        <div class="ord-placed empty" id="oP"></div>
+        <div class="ord-lbl">Word bank — click to add:</div>
+        <div class="wchips" id="oB"></div>`;
+  }
+  else if(q.type==='odd'){
+    h+=`<div class="odd-grid">${q.opts.map((o,i)=>`<button class="odd-opt" id="od${i}" onclick="pickOdd(${i})">${LL(i)}. ${o}</button>`).join('')}</div>`;
+    cb.disabled=true;
+  }
+ 
+  document.getElementById('qInner').innerHTML=h;
+  if(q.type==='order') renderOrder();
+}
+ 
+// ═══════════════════════════════════════════
+//  PICKERS
+// ═══════════════════════════════════════════
+function pickOpt(i){
+  if(answered)return;selOpt=i;
+  document.querySelectorAll('.opt').forEach((el,j)=>{
+    el.style.borderColor=j===i?'var(--pri)':'';
+    el.style.background=j===i?'var(--bg3)':'';
+  });
+  document.getElementById('checkBtn').disabled=false;
+}
+function pickTF(v){
+  if(answered)return;selTF=v;
+  ['tft','tff'].forEach(id=>{const e=document.getElementById(id);if(e){e.style.borderColor='';e.style.background='';}});
+  const e=document.getElementById(v?'tft':'tff');
+  if(e){e.style.borderColor='var(--pri)';e.style.background='var(--bg3)';}
+  document.getElementById('checkBtn').disabled=false;
+}
+function pickOdd(i){
+  if(answered)return;selOdd=i;
+  document.querySelectorAll('.odd-opt').forEach((el,j)=>{
+    el.style.borderColor=j===i?'var(--pri)':'';
+    el.style.background=j===i?'var(--bg3)':'';
+  });
+  document.getElementById('checkBtn').disabled=false;
+}
+ 
+// ── MATCHING ─────────────────────────────
+function mClick(side,idx){
+  if(answered)return;
+  const q=QS[cur];
+  if(side==='L'){
+    if(document.getElementById(`mL${idx}`).classList.contains('matched'))return;
+    if(mSel&&mSel.side==='L'){const p=document.getElementById(`mL${mSel.idx}`);if(p&&!p.classList.contains('matched'))p.classList.remove('sel');}
+    mSel={side:'L',idx};
+    document.getElementById(`mL${idx}`).classList.add('sel');
+  } else {
+    if(!mSel||mSel.side!=='L')return;
+    if(mRUsed.has(idx))return;
+    const li=mSel.idx;
+    const ok=q.pairs[li].R===window._MR[idx];
+    const lE=document.getElementById(`mL${li}`),rE=document.getElementById(`mR${idx}`);
+    lE.classList.remove('sel');
+    if(ok){mCorrect++;mPairs[li]=idx;mRUsed.add(idx);lE.classList.add('matched','locked');rE.classList.add('matched','locked');}
+    else{lE.classList.add('err');rE.classList.add('err');setTimeout(()=>{lE.classList.remove('err');rE.classList.remove('err');},500);}
+    mSel=null;
+    const mi=document.getElementById('mInfo');
+    if(mi)mi.textContent=`Matched: ${mCorrect} / ${q.pairs.length}`;
+    if(mCorrect===q.pairs.length)document.getElementById('checkBtn').disabled=false;
+  }
+}
+ 
+// ── ORDERING ─────────────────────────────
+function renderOrder(){
+  const pEl=document.getElementById('oP'),bEl=document.getElementById('oB');
+  if(!pEl||!bEl)return;
+  pEl.classList.toggle('empty',oPlaced.length===0);
+  pEl.innerHTML=oPlaced.map((w,i)=>`<span class="wc placed" onclick="rmWord(${i})">${w}</span>`).join('');
+  const used={};oPlaced.forEach(w=>{used[w]=(used[w]||0)+1});
+  const seen={};
+  bEl.innerHTML=oAvail.map((w,i)=>{
+    seen[w]=(seen[w]||0)+1;
+    const u=seen[w]<=(used[w]||0);
+    return `<span class="wc${u?' used':''}" ${u?'':` onclick="addWord(${i})"`} id="wb${i}">${w}</span>`;
+  }).join('');
+}
+function addWord(i){if(answered)return;oPlaced.push(oAvail[i]);renderOrder();}
+function rmWord(i){if(answered)return;oPlaced.splice(i,1);renderOrder();}
+ 
+// ── CHART WRITE ──────────────────────────
+function selfMark(ok){
+  if(answered)return;
+  const q=QS[cur];modSc[q.mod].t++;
+  if(ok){score++;modSc[q.mod].g++;}
+  showFB(ok,ok?'Great job! Your sentence uses the correct structure and formal language.':'Keep practising — use the frame and model answer as your guide next time.');
+  document.querySelector('.selfmark-row').style.display='none';
+  lockNext();updProg();
+}
+ 
+// ═══════════════════════════════════════════
+//  CHECK ANSWER
+// ═══════════════════════════════════════════
+function checkAnswer(){
+  if(answered)return;
+  const q=QS[cur];
+ 
+  if(q.type==='chartwrite'){
+    const mb=document.getElementById('mb');
+    document.getElementById('mSent').textContent=q.model;
+    document.getElementById('mCL').innerHTML=q.checklist.map(c=>`<li>${c}</li>`).join('');
+    mb.classList.add('on');
+    document.getElementById('checkBtn').style.display='none';
+    return;
+  }
+ 
+  modSc[q.mod].t++;
+  let ok=false;
+ 
+  if(q.type==='mcq'){
+    if(selOpt===null)return;
+    ok=selOpt===q.ans;
+    document.querySelectorAll('.opt').forEach((el,j)=>{
+      el.classList.add('locked');el.style.borderColor='';el.style.background='';
+      if(j===q.ans)el.classList.add('correct');
+      else if(j===selOpt&&!ok)el.classList.add('wrong');
+      else if(j!==q.ans)el.classList.add('dim');
+    });
+  }
+  else if(q.type==='tf'){
+    if(selTF===null)return;
+    ok=selTF===q.ans;
+    const tE=document.getElementById('tft'),fE=document.getElementById('tff');
+    if(tE){tE.classList.add('locked');tE.style.borderColor='';tE.style.background='';}
+    if(fE){fE.classList.add('locked');fE.style.borderColor='';fE.style.background='';}
+    if(q.ans===true&&tE)tE.classList.add('correct'); else if(tE)tE.classList.add(selTF===true?'wrong':'dim');
+    if(q.ans===false&&fE)fE.classList.add('correct'); else if(fE)fE.classList.add(selTF===false?'wrong':'dim');
+  }
+  else if(q.type==='drop'||q.type==='chartdrop'){
+    const s=document.getElementById('ds');
+    if(!s||!s.value){alert('Please choose an answer from the dropdown.');return;}
+    ok=s.value===q.ans;
+    s.classList.add(ok?'correct':'wrong');s.disabled=true;
+    if(!ok){const h=document.createElement('span');h.className='correct-hint';h.textContent=`✓ Answer: ${q.ans}`;s.after(h);}
+  }
+  else if(q.type==='match'){
+    ok=mCorrect===q.pairs.length;
+    document.querySelectorAll('.m-it').forEach(el=>el.classList.add('locked'));
+  }
+  else if(q.type==='order'){
+    if(oPlaced.length===0){alert('Please build the sentence first.');return;}
+    ok=JSON.stringify(oPlaced)===JSON.stringify(q.ans);
+    const p=document.getElementById('oP');
+    if(p){p.style.borderColor=ok?'var(--ok)':'var(--err)';p.style.background=ok?'var(--ok-bg)':'var(--err-bg)';}
+    if(!ok){const b=document.getElementById('oB');if(b)b.innerHTML=`<div style="font-size:.82rem;font-weight:700;color:var(--mid)">✅ Correct order: <em>${q.ans.join(' — ')}</em></div>`;}
+  }
+  else if(q.type==='odd'){
+    if(selOdd===null)return;
+    ok=selOdd===q.ans;
+    document.querySelectorAll('.odd-opt').forEach((el,j)=>{
+      el.classList.add('locked');el.style.borderColor='';el.style.background='';
+      if(j===q.ans)el.classList.add('correct');
+      else if(j===selOdd&&!ok)el.classList.add('wrong');
+      else el.classList.add('dim');
+    });
+  }
+ 
+  if(ok){score++;modSc[q.mod].g++;}
+  showFB(ok,q.fb);
+  lockNext();updProg();
+}
+ 
+// ═══════════════════════════════════════════
+//  NAVIGATION
+// ═══════════════════════════════════════════
+function nextQ(){
+  cur++;
+  if(cur>=TOTAL){showResults();return;}
+  const c=document.getElementById('qCard');
+  c.style.animation='none';
+  requestAnimationFrame(()=>{c.style.animation='';renderQ();});
+  window.scrollTo(0,55);
+}
+ 
+// ═══════════════════════════════════════════
+//  RESULTS
+// ═══════════════════════════════════════════
+function showResults(){
+  document.getElementById('quiz-area').style.display='none';
+  const pct=Math.round(score/TOTAL*100);
+  let emoji,grade,col;
+  if(pct>=90){emoji='🏆';grade='Outstanding! You are a Report Writing Expert!';col='var(--ok)'}
+  else if(pct>=80){emoji='🥇';grade='Excellent! Strong understanding of report writing.';col='#16a34a'}
+  else if(pct>=70){emoji='🥈';grade='Good work! Review a few modules to sharpen your skills.';col='var(--sec-d)'}
+  else if(pct>=60){emoji='🥉';grade='Fair attempt. Revisit the Report Writing Booster app.';col='var(--pri)'}
+  else{emoji='📚';grade='Keep going! Open the Report Writing Pro app and try again.';col='var(--err)'}
+ 
+  const bd=Object.entries(modSc).filter(([,v])=>v.t>0)
+    .map(([m,v])=>`<div class="bd-it"><div class="bd-mod">${m}</div><div class="bd-sc">${v.g}<span class="bd-of">/${v.t}</span></div></div>`).join('');
+  const today=new Date().toLocaleDateString('en-GB',{day:'numeric',month:'long',year:'numeric'});
+ 
+  document.getElementById('results').style.display='block';
+  document.getElementById('results').innerHTML=`
+    <div class="res-card">
+      <span class="res-emoji">${emoji}</span>
+      <div class="res-title">Quiz Complete!</div>
+      <div class="res-sub">LSC 1103 · Report Writing · ${TOTAL} Questions</div>
+      <div class="score-big">${score}<span class="score-den">/${TOTAL}</span></div>
+      <div style="color:var(--mid);font-size:.85rem;margin:6px 0 16px;font-weight:700">${pct}% correct</div>
+      <div class="pct-bg"><div class="pct-fill" id="pBar" style="width:0%"></div></div>
+      <div class="grade-lbl" style="color:${col}">${grade}</div>
+      <div class="breakdown">${bd}</div>
+      <div class="cert">
+        <div class="cert-ttl">📜 Certificate of Completion</div>
+        <div class="cert-name">LSC 1103 — Report Writing Quiz</div>
+        <div class="cert-det">Score: ${score}/${TOTAL} (${pct}%) · Date: ${today}</div>
+        <div class="cert-det">Higher Colleges of Technology · Designed by: Nazila Motahari</div>
+      </div>
+      <div class="res-btns">
+        <button class="btn-res print" onclick="window.print()">🖨️ Print / Save</button>
+        <button class="btn-res restart" onclick="restartQuiz()">🔄 Try Again</button>
+      </div>
+    </div>`;
+  setTimeout(()=>{document.getElementById('pBar').style.width=pct+'%';},100);
+  document.getElementById('progFill').style.width='100%';
+  document.getElementById('progLbl').textContent='Quiz Complete!';
+  document.getElementById('modLbl').textContent=`All ${TOTAL} Questions Done`;
+  document.getElementById('scoreDisp').textContent=score;
+}
+ 
+function restartQuiz(){
+  cur=0;score=0;answered=false;selOpt=null;selTF=null;selOdd=null;
+  Object.keys(modSc).forEach(k=>{modSc[k]={g:0,t:0}});
+  document.getElementById('results').style.display='none';
+  document.getElementById('quiz-area').style.display='block';
+  renderQ();window.scrollTo(0,0);
+}
+ 
+renderQ();
+</script>
+</body>
+</html>
